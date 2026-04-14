@@ -1,9 +1,4 @@
-"""
-Blockchain Dashboard — main entry point.
-
-Run with:
-    streamlit run app.py
-"""
+"""Simple Streamlit entry point for the student project."""
 
 import streamlit as st
 
@@ -14,10 +9,10 @@ from modules.m4_ai_component import render as render_m4
 
 st.set_page_config(page_title="Blockchain Dashboard", layout="wide")
 
-st.title("⛓️ Blockchain Dashboard")
+st.title("Blockchain Dashboard")
 
 tab1, tab2, tab3, tab4 = st.tabs(
-    ["M1 – PoW Monitor", "M2 – Block Header", "M3 – Difficulty History", "M4 – AI Component"]
+    ["M1 - PoW Monitor", "M2 - Block Header", "M3 - Difficulty History", "M4 - AI Component"]
 )
 
 with tab1:

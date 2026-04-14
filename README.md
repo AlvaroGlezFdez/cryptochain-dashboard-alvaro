@@ -1,74 +1,68 @@
-# Blockchain Dashboard — Project Template
+# Blockchain Dashboard Project
+
+Use this repository to build your blockchain dashboard project.
+Update this README every week.
 
 ## Student Information
 
 | Field | Value |
 |---|---|
-| **Student Name** | <!-- Your full name --> |
-| **GitHub Username** | <!-- @your-username --> |
-| **Project Title** | <!-- e.g. Bitcoin PoW Dashboard --> |
-| **Chosen AI Approach** | <!-- e.g. anomaly detection, price prediction, clustering… --> |
+| Student Name | |
+| GitHub Username | |
+| Project Title | |
+| Chosen AI Approach | |
 
----
+## Module Tracking
 
-## Module Status
+Use one of these values: `Not started`, `In progress`, `Done`
 
-| Module | Description | Status |
+| Module | What it should include | Status |
 |---|---|---|
-| M1 | PoW Monitor | 🔲 Not started |
-| M2 | Block Header Explorer | 🔲 Not started |
-| M3 | Difficulty History | 🔲 Not started |
-| M4 | AI Component | 🔲 Not started |
+| M1 | Proof of Work Monitor | Not started |
+| M2 | Block Header Analyzer | Not started |
+| M3 | Difficulty History | Not started |
+| M4 | AI Component | Not started |
 
-> Update status to: 🔲 Not started · 🚧 In progress · ✅ Done
+## Current Progress
 
----
+Write 3 to 5 short lines about what you have already done.
+
+- 
+- 
+- 
+
+## Next Step
+
+Write the next small step you will do before the next class.
+
+- 
+
+## Main Problem or Blocker
+
+Write here if you are stuck with something.
+
+- 
 
 ## How to Run
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/YOUR-ORG/YOUR-REPO-NAME.git
-cd YOUR-REPO-NAME
-
-# 2. Create and activate a virtual environment
-python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
-
-# 3. Install dependencies
 pip install -r requirements.txt
-
-# 4. Launch the dashboard
 streamlit run app.py
 ```
 
----
-
 ## Project Structure
 
-```
+```text
 template-blockchain-dashboard/
-├── README.md
-├── requirements.txt
-├── .gitignore
-├── app.py
-├── api/
-│   └── blockchain_client.py
-├── modules/
-│   ├── m1_pow_monitor.py
-│   ├── m2_block_header.py
-│   ├── m3_difficulty_history.py
-│   └── m4_ai_component.py
-├── report/
-│   └── README.md
-├── data/
-│   └── .gitkeep
-└── tests/
-    └── test_structure.py
+|-- README.md
+|-- requirements.txt
+|-- .gitignore
+|-- app.py
+|-- api/
+|   `-- blockchain_client.py
+`-- modules/
+    |-- m1_pow_monitor.py
+    |-- m2_block_header.py
+    |-- m3_difficulty_history.py
+    `-- m4_ai_component.py
 ```
-
----
-
-## Next Milestone
-
-<!-- Describe what you plan to implement or submit next -->

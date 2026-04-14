@@ -1,8 +1,4 @@
-"""
-Module M3 – Difficulty History.
-
-Plots the historical Bitcoin mining difficulty.
-"""
+"""Starter file for module M3."""
 
 import pandas as pd
 import plotly.express as px
@@ -12,13 +8,14 @@ from api.blockchain_client import get_difficulty_history
 
 
 def render() -> None:
-    """Render the Difficulty History panel."""
-    st.header("M3 – Difficulty History")
+    """Render the M3 panel."""
+    st.header("M3 - Difficulty History")
+    st.write("Use this module to plot the history of Bitcoin difficulty.")
 
     n_points = st.slider("Number of data points", min_value=10, max_value=365, value=100, key="m3_n")
 
     if st.button("Load difficulty chart", key="m3_load"):
-        with st.spinner("Fetching…"):
+        with st.spinner("Fetching data..."):
             try:
                 values = get_difficulty_history(n_points)
                 df = pd.DataFrame(values)
@@ -30,4 +27,4 @@ def render() -> None:
             except Exception as exc:
                 st.error(f"Error loading chart: {exc}")
     else:
-        st.info("Click *Load difficulty chart* to display the chart.")
+        st.info("Click Load difficulty chart to display the chart.")
