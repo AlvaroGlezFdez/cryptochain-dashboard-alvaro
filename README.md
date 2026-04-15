@@ -1,68 +1,43 @@
-# Blockchain Dashboard Project
+#  CryptoChain Analyzer Dashboard
 
-Use this repository to build your blockchain dashboard project.
-Update this README every week.
+**Asignatura:** Cryptography | [cite_start]Universidad Alfonso X el Sabio [cite: 1]
+[cite_start]**Profesor:** Prof. Jorge Calvo [cite: 2]
+**Estudiante:** Álvaro González Fernández
+**GitHub User:** (TU_USUARIO_AQUÍ)
 
-## Student Information
+---
 
-| Field | Value |
-|---|---|
-| Student Name | |
-| GitHub Username | |
-| Project Title | |
-| Chosen AI Approach | |
+##  Descripción del Proyecto
+[cite_start]Este proyecto consiste en el desarrollo de un panel de control interactivo (dashboard) en tiempo real utilizando Python para visualizar y analizar métricas criptográficas de la red Bitcoin. [cite: 12] [cite_start]El objetivo es aplicar conceptos teóricos como SHA-256, Proof of Work y dificultad a datos reales obtenidos de una API pública. [cite: 75]
 
-## Module Tracking
+##  Enfoque de IA (M4)
+[cite_start]Para el módulo de Inteligencia Artificial [cite: 104][cite_start], he seleccionado el **Detector de Anomalías**. [cite: 107]
+* [cite_start]**Objetivo:** Identificar bloques cuyo tiempo de llegada (inter-arrival time) sea estadísticamente anormal. [cite: 107]
+* [cite_start]**Justificación:** Se utilizará la distribución exponencial como base (baseline) para detectar desviaciones que puedan indicar comportamientos específicos de minería. [cite: 108]
 
-Use one of these values: `Not started`, `In progress`, `Done`
+##  Estado de los Módulos
+| Módulo | Descripción | Estado |
+| :--- | :--- | :--- |
+| **M1** | Proof of Work Monitor | ⏳ Pendiente |
+| **M2** | Block Header Analyzer | ⏳ Pendiente |
+| **M3** | Difficulty History | ⏳ Pendiente |
+| **M4** | AI Component (Anomaly Detector) | ⏳ Pendiente |
 
-| Module | What it should include | Status |
-|---|---|---|
-| M1 | Proof of Work Monitor | Not started |
-| M2 | Block Header Analyzer | Not started |
-| M3 | Difficulty History | Not started |
-| M4 | AI Component | Not started |
+##  Progreso Actual
+* [cite_start][x] Repositorio de GitHub Classroom aceptado. [cite: 33, 34]
+* [cite_start][x] Estructura inicial del proyecto configurada (carpetas api/, modules/, report/). [cite: 149, 164]
+* [cite_start][x] README inicial completado con información del estudiante y enfoque de IA. [cite: 36, 40]
+* [cite_start][ ] Primera llamada a la API y script de prueba (Milestone 2). [cite: 46]
 
-## Current Progress
+##  Next Step
+[cite_start]Escribir un script de Python de máximo 10 líneas en `api/blockchain_client.py` que conecte con la API de Blockstream para recuperar datos del último bloque. [cite: 49, 64]
 
-Write 3 to 5 short lines about what you have already done.
+##  Bloqueadores (Blockers)
+* Ninguno actualmente.
 
-- 
-- 
-- 
+---
 
-## Next Step
-
-Write the next small step you will do before the next class.
-
-- 
-
-## Main Problem or Blocker
-
-Write here if you are stuck with something.
-
-- 
-
-## How to Run
-
-```bash
-pip install -r requirements.txt
-streamlit run app.py
-```
-
-## Project Structure
-
-```text
-template-blockchain-dashboard/
-|-- README.md
-|-- requirements.txt
-|-- .gitignore
-|-- app.py
-|-- api/
-|   `-- blockchain_client.py
-`-- modules/
-    |-- m1_pow_monitor.py
-    |-- m2_block_header.py
-    |-- m3_difficulty_history.py
-    `-- m4_ai_component.py
-```
+### 🛠️ Instrucciones de Ejecución
+[cite_start]El dashboard se ejecutará mediante los siguientes pasos: [cite: 205]
+1. Instalar dependencias: `pip install -r requirements.txt`
+2. Ejecutar aplicación: `streamlit run app.py`
