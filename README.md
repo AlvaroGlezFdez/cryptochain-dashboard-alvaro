@@ -1,68 +1,34 @@
-# Blockchain Dashboard Project
+# ₿ CryptoChain Insights: Bitcoin Dashboard
 
-Use this repository to build your blockchain dashboard project.
-Update this README every week.
+**Estudiante:** Álvaro González Fernández  
+**Asignatura:** Criptografía y Seguridad  
+**Institución:** Universidad Alfonso X el Sabio (UAX)
 
-## Student Information
+---
 
-| Field | Value |
-|---|---|
-| Student Name | |
-| GitHub Username | |
-| Project Title | |
-| Chosen AI Approach | |
+## 🚀 Descripción del Proyecto
+**CryptoChain Insights** es un dashboard interactivo desarrollado en Python para la monitorización en tiempo real de la red Bitcoin. El objetivo es analizar métricas críticas de la cadena de bloques, como el Proof of Work (PoW), la evolución de la dificultad y la seguridad de los hashes.
 
-## Module Tracking
+## 🧠 Componente de IA (Módulo M4)
+* **Enfoque seleccionado:** Detector de Anomalías.
+* **Objetivo:** Identificar variaciones estadísticas inusuales en el tiempo de minado de bloques (inter-arrival time) para detectar posibles picos de hash rate o retrasos en la red.
+* **Metodología:** Análisis de la distribución exponencial de los tiempos de bloque.
 
-Use one of these values: `Not started`, `In progress`, `Done`
+## 📊 Estado del Desarrollo
+| Módulo | Descripción | Estado |
+| :--- | :--- | :--- |
+| **M1** | Monitor de Proof of Work (Hash & Target) | ⏳ En desarrollo |
+| **M2** | Analizador de Header de Bloque | ⏳ Pendiente |
+| **M3** | Historial de Dificultad | ⏳ Pendiente |
+| **M4** | IA: Detector de Anomalías | ⏳ Pendiente |
 
-| Module | What it should include | Status |
-|---|---|---|
-| M1 | Proof of Work Monitor | Not started |
-| M2 | Block Header Analyzer | Not started |
-| M3 | Difficulty History | Not started |
-| M4 | AI Component | Not started |
+---
 
-## Current Progress
+## ✅ Hitos Completados (Sesión 1)
+1.  **Configuración del Entorno:** Clonación del repositorio y verificación de la estructura de carpetas.
+2.  **Llamada a la API:** Implementación funcional del cliente en `api/blockchain_client.py` que recupera datos en vivo (Altura, Hash, Dificultad, Nonce).
+3.  **Documentación inicial:** Definición del alcance del proyecto y selección del componente de IA.
 
-Write 3 to 5 short lines about what you have already done.
-
-- 
-- 
-- 
-
-## Next Step
-
-Write the next small step you will do before the next class.
-
-- 
-
-## Main Problem or Blocker
-
-Write here if you are stuck with something.
-
-- 
-
-## How to Run
-
-```bash
-pip install -r requirements.txt
-streamlit run app.py
-```
-
-## Project Structure
-
-```text
-template-blockchain-dashboard/
-|-- README.md
-|-- requirements.txt
-|-- .gitignore
-|-- app.py
-|-- api/
-|   `-- blockchain_client.py
-`-- modules/
-    |-- m1_pow_monitor.py
-    |-- m2_block_header.py
-    |-- m3_difficulty_history.py
-    `-- m4_ai_component.py
-```
+## ⏭️ Próximos Pasos
+* Instalación y configuración de **Streamlit** para la interfaz visual.
+* Mapeo de los datos de la API hacia los widgets del dashboard en `app.py`.
