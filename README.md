@@ -37,7 +37,7 @@
 
 ---
 
-### 🛠️ Instrucciones de Ejecución
+### Instrucciones de Ejecución
 [cite_start]El dashboard se ejecutará mediante los siguientes pasos: [cite: 205]
 1. Instalar dependencias: `pip install -r requirements.txt`
 2. Ejecutar aplicación: `streamlit run app.py`
