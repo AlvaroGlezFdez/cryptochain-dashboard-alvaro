@@ -35,7 +35,7 @@ def _fetch_header_data():
 
 
 def render() -> None:
-    st.header("M2 — Analizador de Header de Bloque")
+    st.header("Analizador de Header de Bloque")
     st.caption("Último bloque en caché 60 s — verificación PoW local con hashlib.")
 
     with st.spinner("Obteniendo header del último bloque..."):
@@ -53,12 +53,12 @@ def render() -> None:
     dt_utc = datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
 
     fields = {
-        "Version": f"{block.get('version')}  (`{block.get('version'):#010x}`)",
+        "Version":            f"{block.get('version')}  (`{block.get('version'):#010x}`)",
         "Previous block hash": f"`{block.get('previousblockhash')}`",
-        "Merkle root": f"`{block.get('merkle_root')}`",
-        "Timestamp": f"{ts}  →  {dt_utc}",
-        "Bits": f"`{bits_int:#010x}`  ({bits_int})",
-        "Nonce": f"{block.get('nonce')}",
+        "Merkle root":         f"`{block.get('merkle_root')}`",
+        "Timestamp":           f"{ts}  →  {dt_utc}",
+        "Bits":                f"`{bits_int:#010x}`  ({bits_int})",
+        "Nonce":               f"{block.get('nonce')}",
     }
 
     for label, value in fields.items():
@@ -72,19 +72,15 @@ def render() -> None:
     st.subheader("Verificación local del Proof of Work")
 
     if not header_hex:
-        st.warning("No se pudo obtener el header en hex — la verificación no está disponible.")
+        st.warning("No se pudo obtener el header en hex — verificación no disponible.")
         return
 
     if len(header_hex) != 160:
-        st.error(f"Header inesperado: {len(header_hex)} caracteres (se esperaban 160).")
+        st.error(f"Header inesperado: {len(header_hex)} chars (se esperaban 160).")
         return
 
-    # SHA256(SHA256(header)) → resultado en little-endian → invertir para display
     header_bytes = bytes.fromhex(header_hex)
-    hash_bytes_le = _double_sha256(header_bytes)
-    computed_hash = hash_bytes_le[::-1].hex()   # big-endian (display format)
-
-    hash_matches = computed_hash == block_hash
+    computed_hash = _double_sha256(header_bytes)[::-1].hex()   # big-endian display
 
     col_a, col_b = st.columns(2)
     col_a.markdown("**Hash calculado localmente**")
@@ -92,19 +88,17 @@ def render() -> None:
     col_b.markdown("**Hash oficial (Blockstream)**")
     col_b.code(block_hash, language=None)
 
-    if hash_matches:
-        st.success("✅ Los hashes coinciden — el header está íntegro.")
+    if computed_hash == block_hash:
+        st.success("Los hashes coinciden — el header está íntegro.")
     else:
-        st.error("❌ Los hashes NO coinciden.")
+        st.error("Los hashes NO coinciden.")
 
     # ── 3. Bits a cero del hash ────────────────────────────────────────────────
     st.subheader("Bits a cero del hash resultante")
 
     leading_zeros = _count_leading_zero_bits(computed_hash)
-    st.metric("Bits a cero (leading zeros)", f"{leading_zeros} / 256")
-
-    frac = leading_zeros / 256
-    st.progress(frac, text=f"{leading_zeros} bits a cero sobre 256")
+    st.metric("Leading zero bits", f"{leading_zeros} / 256")
+    st.progress(leading_zeros / 256, text=f"{leading_zeros} bits a cero sobre 256")
 
     # ── 4. Target derivado del campo bits ──────────────────────────────────────
     st.subheader("Target derivado del campo `bits`")
@@ -112,22 +106,15 @@ def render() -> None:
     exp = (bits_int >> 24) & 0xFF
     coef = bits_int & 0x00FFFFFF
     target = _target_from_bits(bits_int)
-    target_hex = f"{target:064x}"
 
     with st.expander("Fórmula y cálculo"):
         st.latex(r"\text{target} = \text{coef} \times 2^{8 \times (\text{exp} - 3)}")
-        st.write(f"- `bits` = `{bits_int:#010x}`")
-        st.write(f"- exp  = `{exp:#04x}` = {exp}")
-        st.write(f"- coef = `{coef:#08x}` = {coef}")
-        st.write(f"- target = `{coef:#x}` × 2^(8×({exp}−3)) = 2^(8×{exp - 3})")
+        st.caption(f"bits = `{bits_int:#010x}`  ·  exp = {exp}  ·  coef = `{coef:#08x}`")
 
-    st.code(target_hex, language=None)
+    st.code(f"{target:064x}", language=None)
 
-    # Verificar que hash < target (PoW válido)
     hash_int = int(computed_hash, 16)
-    pow_valid = hash_int < target
-
-    if pow_valid:
-        st.success(f"✅ hash < target — Proof of Work válido")
+    if hash_int < target:
+        st.success("hash < target — Proof of Work válido")
     else:
-        st.error(f"❌ hash ≥ target — Proof of Work inválido")
+        st.error("hash >= target — Proof of Work inválido")

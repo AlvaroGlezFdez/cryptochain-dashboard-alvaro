@@ -7,7 +7,17 @@ from scipy.stats import expon
 from api.blockchain_client import get_last_n_blocks
 
 N_BLOCKS = 200
-ALPHA = 0.05          # nivel de significación para anomalías
+ALPHA = 0.05
+
+# ── Shared Plotly layout ──────────────────────────────────────────────────────
+_LAYOUT = dict(
+    plot_bgcolor="#FFFFFF",
+    paper_bgcolor="#F5F0E8",
+    font=dict(color="#6B6B6B", size=11),
+    margin=dict(t=20, b=40, l=60, r=20),
+    xaxis=dict(gridcolor="#E8E0D5", linecolor="#C4B5A8", title_font=dict(size=11)),
+    yaxis=dict(gridcolor="#E8E0D5", linecolor="#C4B5A8", title_font=dict(size=11)),
+)
 
 
 @st.cache_data(ttl=60)
@@ -16,7 +26,6 @@ def _fetch_blocks():
 
 
 def _inter_arrival_times(blocks: list) -> tuple[list, list]:
-    """Return (inter_times_seconds, heights) aligned by index."""
     sorted_b = sorted(blocks, key=lambda b: b["height"], reverse=True)
     inter_times = [
         sorted_b[i]["timestamp"] - sorted_b[i + 1]["timestamp"]
@@ -28,42 +37,30 @@ def _inter_arrival_times(blocks: list) -> tuple[list, list]:
 
 def _two_tailed_pvalue(t: float, loc: float, scale: float) -> float:
     p_lo = expon.cdf(t, loc=loc, scale=scale)
-    p_hi = 1.0 - p_lo
-    return float(2 * min(p_lo, p_hi))
+    return float(2 * min(p_lo, 1.0 - p_lo))
 
 
 def render() -> None:
-    st.header("M4 — IA: Detector de Anomalías en Tiempos de Bloque")
+    st.header("IA — Detector de Anomalías en Tiempos de Bloque")
 
-    # ── Explicación teórica ───────────────────────────────────────────────────
     with st.expander("Marco teórico: ¿por qué distribución exponencial?"):
         st.markdown(
             """
-El minado de Bitcoin es un **proceso de Poisson**: en cada intento, todos
-los mineros del mundo calculan SHA256²(header) esperando que el resultado
-sea menor que el target de dificultad. Cada intento es *independiente* y
-tiene probabilidad de éxito extremadamente pequeña.
+El minado de Bitcoin es un **proceso de Poisson**: en cada intento, todos los mineros
+calculan SHA256²(header) esperando que el resultado sea menor que el target. Cada intento
+es *independiente* y tiene probabilidad de éxito ínfima.
 
-Cuando los intentos de un proceso de Poisson con tasa constante λ se
-suceden en el tiempo, los **tiempos de espera entre eventos** siguen una
-distribución **exponencial** con parámetro λ y media 1/λ.
+Un proceso de Poisson con tasa constante λ produce tiempos de espera **exponencialmente
+distribuidos** con media 1/λ. En Bitcoin, el ajuste de dificultad cada 2 016 bloques
+mantiene la media cerca de **600 segundos (10 min)** → inter-arrival times ∼ Exp(1/600).
 
-En Bitcoin, el ajuste de dificultad cada 2 016 bloques mantiene la media
-cerca de **600 segundos (10 min)**, de modo que los inter-arrival times
-∼ Exp(λ = 1/600).
+**Propiedad sin memoria (*memoryless*):** si el último bloque llegó hace 5 min, la
+probabilidad de que el siguiente llegue en los próximos 30 s es exactamente la misma que
+si acabara de llegar. Esta propiedad es única de la exponencial.
 
-**Propiedad sin memoria (*memoryless*):** si el último bloque llegó hace
-5 min, la probabilidad de que el siguiente llegue en los próximos 30 s
-es exactamente la misma que si acabara de llegar. Esta propiedad es
-exclusiva de la distribución exponencial entre las distribuciones continuas.
-
-**Detección de anomalías:** cualquier bloque con un inter-arrival time en
-las colas extremas (p-valor < 5 % en test bilateral) es estadísticamente
-inusual. Puede indicar:
-- **Bloque muy rápido** (p < 2.5 % cola inferior): pico puntual de hash rate
-  o bloque retenido previamente.
-- **Bloque muy lento** (p < 2.5 % cola superior): interrupción de la red,
-  caída de hash rate o reorg.
+Un **detector de anomalías** usa esta distribución como baseline: un bloque en las colas
+extremas (p-valor bilateral < 5 %) puede indicar un pico de hash rate, un bloque retenido,
+o una interrupción de la red.
             """
         )
 
@@ -79,38 +76,42 @@ inusual. Puede indicar:
         st.error("No se pudieron obtener suficientes bloques para el análisis.")
         return
 
-    inter_times, heights = _inter_arrival_times(blocks)
+    raw_times, all_heights = _inter_arrival_times(blocks)
 
-    if not inter_times:
-        st.error("No hay suficientes datos para calcular tiempos entre bloques.")
+    # ── Bug fix: filtrar valores <= 0 antes del ajuste exponencial ───────────
+    valid_pairs = [(t, h) for t, h in zip(raw_times, all_heights) if t > 0]
+    if len(valid_pairs) < 10:
+        st.warning("No hay suficientes datos válidos (inter-arrival times > 0) para el análisis.")
         return
 
+    inter_times = [t for t, _ in valid_pairs]
+    heights     = [h for _, h in valid_pairs]
     arr = np.array(inter_times, dtype=float)
 
     # ── Ajuste exponencial ────────────────────────────────────────────────────
-    loc, scale = expon.fit(arr, floc=0)   # loc=0 fijo: la exponencial empieza en 0
+    loc, scale = expon.fit(arr, floc=0)
 
-    p_values = [_two_tailed_pvalue(t, loc, scale) for t in inter_times]
+    p_values     = [_two_tailed_pvalue(t, loc, scale) for t in inter_times]
     anomaly_flags = [p < ALPHA for p in p_values]
 
-    n_anom = sum(anomaly_flags)
+    n_anom   = sum(anomaly_flags)
     pct_anom = 100 * n_anom / len(inter_times)
 
     # ── Métricas resumen ──────────────────────────────────────────────────────
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Bloques analizados", len(inter_times))
+    c1.metric("Bloques analizados",    len(inter_times))
     c2.metric("Anomalías (p < 0.05)", n_anom)
-    c3.metric("% anomalías", f"{pct_anom:.1f} %")
-    c4.metric("λ⁻¹ ajustado", f"{scale:.0f} s")
+    c3.metric("% anomalías",           f"{pct_anom:.1f} %")
+    c4.metric("λ⁻¹ ajustado",          f"{scale:.0f} s")
 
     c5, c6 = st.columns(2)
-    c5.metric("Media empírica", f"{np.mean(arr):.0f} s")
+    c5.metric("Media empírica",  f"{np.mean(arr):.0f} s")
     c6.metric("Mediana empírica", f"{np.median(arr):.0f} s")
 
     # ── Histograma + curva teórica ────────────────────────────────────────────
     st.subheader("Distribución empírica vs. exponencial ajustada")
 
-    x_range = np.linspace(0, min(float(arr.max()), 5000), 600)
+    x_range  = np.linspace(0, min(float(arr.max()), 5000), 600)
     pdf_vals = expon.pdf(x_range, loc=loc, scale=scale)
 
     fig_hist = go.Figure()
@@ -119,8 +120,8 @@ inusual. Puede indicar:
         nbinsx=40,
         histnorm="probability density",
         name="Tiempos observados",
-        marker_color="#f7931a",
-        opacity=0.7,
+        marker_color="#8B6F5E",
+        opacity=0.75,
         hovertemplate="[%{x:.0f} s]  densidad: %{y:.5f}<extra></extra>",
     ))
     fig_hist.add_trace(go.Scatter(
@@ -128,27 +129,25 @@ inusual. Puede indicar:
         y=pdf_vals.tolist(),
         mode="lines",
         name=f"Exp ajustada  λ⁻¹ = {scale:.0f} s",
-        line=dict(color="#00d4ff", width=3),
+        line=dict(color="#4A3728", width=2.5),
         hovertemplate="t = %{x:.0f} s<br>f(t) = %{y:.6f}<extra></extra>",
     ))
     fig_hist.add_vline(
-        x=600,
-        line_dash="dash", line_color="white", line_width=1.5,
-        annotation_text="600 s (target)",
+        x=600, line_dash="dash", line_color="#A0522D", line_width=1.5,
+        annotation_text="600 s target",
         annotation_position="top right",
-        annotation_font_color="white",
+        annotation_font_color="#A0522D",
     )
     fig_hist.update_layout(
         xaxis_title="Segundos entre bloques",
         yaxis_title="Densidad de probabilidad",
-        template="plotly_dark",
-        legend=dict(x=0.55, y=0.95),
-        margin=dict(t=20),
+        legend=dict(x=0.55, y=0.95, bgcolor="rgba(245,240,232,0.8)"),
+        **_LAYOUT,
     )
     st.plotly_chart(fig_hist, use_container_width=True)
 
-    # ── Scatter: tiempos por bloque con anomalías marcadas ────────────────────
-    st.subheader("Inter-arrival times por altura — anomalías marcadas en rojo")
+    # ── Scatter por altura con anomalías ──────────────────────────────────────
+    st.subheader("Inter-arrival times por altura — anomalías marcadas")
 
     norm_h = [heights[i] for i, a in enumerate(anomaly_flags) if not a]
     norm_t = [inter_times[i] for i, a in enumerate(anomaly_flags) if not a]
@@ -161,7 +160,7 @@ inusual. Puede indicar:
         x=norm_h, y=norm_t,
         mode="markers",
         name="Normal",
-        marker=dict(color="#f7931a", size=5, opacity=0.55),
+        marker=dict(color="#8B6F5E", size=5, opacity=0.6),
         hovertemplate="Bloque %{x}<br>%{y:.0f} s<extra></extra>",
     ))
     if anom_h:
@@ -169,23 +168,22 @@ inusual. Puede indicar:
             x=anom_h, y=anom_t,
             mode="markers",
             name=f"Anomalía (p < {ALPHA})",
-            marker=dict(color="#e74c3c", size=11, symbol="x-open", line_width=2),
+            marker=dict(color="#A0522D", size=11, symbol="x-open",
+                        line=dict(width=2, color="#A0522D")),
             text=[f"p = {p:.4f}" for p in anom_p],
             hovertemplate="Bloque %{x}<br>%{y:.0f} s<br>%{text}<extra></extra>",
         ))
     fig_sc.add_hline(
-        y=600,
-        line_dash="dash", line_color="white", line_width=1.5,
-        annotation_text="600 s (target)",
+        y=600, line_dash="dash", line_color="#A0522D", line_width=1.5,
+        annotation_text="600 s target",
         annotation_position="top right",
-        annotation_font_color="white",
+        annotation_font_color="#A0522D",
     )
     fig_sc.update_layout(
         xaxis_title="Altura del bloque",
         yaxis_title="Segundos entre bloques",
-        template="plotly_dark",
-        legend=dict(x=0.01, y=0.99),
-        margin=dict(t=20),
+        legend=dict(x=0.01, y=0.99, bgcolor="rgba(245,240,232,0.8)"),
+        **_LAYOUT,
     )
     st.plotly_chart(fig_sc, use_container_width=True)
 
@@ -193,10 +191,10 @@ inusual. Puede indicar:
     if n_anom > 0:
         st.subheader(f"Detalle de las {n_anom} anomalías detectadas")
         df_anom = pd.DataFrame({
-            "Altura": anom_h,
+            "Altura":    anom_h,
             "Tiempo (s)": [round(t) for t in anom_t],
-            "p-valor": [round(p, 6) for p in anom_p],
-            "Tipo": ["Muy rápido" if t < 600 else "Muy lento" for t in anom_t],
+            "p-valor":   [round(p, 6) for p in anom_p],
+            "Tipo":      ["Muy rápido" if t < 600 else "Muy lento" for t in anom_t],
         }).sort_values("p-valor").reset_index(drop=True)
         st.dataframe(df_anom, use_container_width=True)
     else:
