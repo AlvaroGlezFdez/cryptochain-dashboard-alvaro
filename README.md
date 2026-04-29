@@ -65,3 +65,21 @@ pip install -r requirements.txt
 # 2. Lanzar el dashboard
 streamlit run app.py
 ```
+
+<!-- student-repo-auditor:teacher-feedback:start -->
+## Teacher Feedback
+
+### Kick-off Review
+
+Review time: 2026-04-22 12:25 CEST
+Status: Amber
+
+Strength:
+- Your repository keeps the expected classroom structure.
+
+Improve now:
+- The README is present but still misses part of the required kickoff information.
+
+Next step:
+- Complete the README fields for student information, AI approach, module status, and next step.
+<!-- student-repo-auditor:teacher-feedback:end -->
