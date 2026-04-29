@@ -1,5 +1,7 @@
-requests
 streamlit
+requests
 pandas
-matplotlib
 numpy
+plotly
+scipy
+scikit-learn

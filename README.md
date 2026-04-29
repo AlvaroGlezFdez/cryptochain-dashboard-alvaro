@@ -1,34 +1,67 @@
-# ₿ CryptoChain Insights: Bitcoin Dashboard
+# CryptoChain Insights Dashboard
 
 **Estudiante:** Álvaro González Fernández  
-**Asignatura:** Criptografía y Seguridad  
-**Institución:** Universidad Alfonso X el Sabio (UAX)
+**GitHub User:** TU_USUARIO  
+**Asignatura:** Criptografía  
+**Institución:** Universidad Alfonso X el Sabio (UAX)  
+**Profesor:** Jorge Calvo  
 
 ---
 
-## 🚀 Descripción del Proyecto
-**CryptoChain Insights** es un dashboard interactivo desarrollado en Python para la monitorización en tiempo real de la red Bitcoin. El objetivo es analizar métricas críticas de la cadena de bloques, como el Proof of Work (PoW), la evolución de la dificultad y la seguridad de los hashes.
+## Descripción del Proyecto
 
-## 🧠 Componente de IA (Módulo M4)
-* **Enfoque seleccionado:** Detector de Anomalías.
-* **Objetivo:** Identificar variaciones estadísticas inusuales en el tiempo de minado de bloques (inter-arrival time) para detectar posibles picos de hash rate o retrasos en la red.
-* **Metodología:** Análisis de la distribución exponencial de los tiempos de bloque.
+**CryptoChain Insights Dashboard** es un panel de control interactivo desarrollado en Python con Streamlit para visualizar y analizar métricas criptográficas de la red Bitcoin en tiempo real. El proyecto aplica conceptos teóricos como SHA-256, Proof of Work y ajuste de dificultad sobre datos reales obtenidos de APIs públicas (Blockstream, Mempool.space).
 
-## 📊 Estado del Desarrollo
+---
+
+## Enfoque de IA — Módulo M4
+
+**Tipo:** Detector de Anomalías  
+**Objetivo:** Identificar bloques cuyo tiempo de llegada (inter-arrival time) sea estadísticamente anormal respecto al comportamiento esperado de la red.  
+**Metodología:** Se modela el tiempo entre bloques mediante una distribución exponencial con media 600 s (baseline teórico de Bitcoin). Los bloques que superen el umbral del percentil 95 o estén por debajo del percentil 5 se clasifican como anomalías y se resaltan visualmente en el dashboard.
+
+---
+
+## Estado de los Módulos
+
 | Módulo | Descripción | Estado |
 | :--- | :--- | :--- |
-| **M1** | Monitor de Proof of Work (Hash & Target) | ⏳ En desarrollo |
-| **M2** | Analizador de Header de Bloque | ⏳ Pendiente |
-| **M3** | Historial de Dificultad | ⏳ Pendiente |
-| **M4** | IA: Detector de Anomalías | ⏳ Pendiente |
+| **M1** | Monitor de Proof of Work (dificultad, hash rate, tiempos entre bloques) | 🚧 En desarrollo |
+| **M2** | Analizador de Header de Bloque (6 campos, verificación SHA-256², bits a cero) | 🚧 En desarrollo |
+| **M3** | Historial de Dificultad (periodos de 2016 bloques, ratio tiempo_real/600 s) | 🚧 En desarrollo |
+| **M4** | IA — Detector de Anomalías (distribución exponencial) | 🚧 En desarrollo |
 
 ---
 
-## ✅ Hitos Completados (Sesión 1)
-1.  **Configuración del Entorno:** Clonación del repositorio y verificación de la estructura de carpetas.
-2.  **Llamada a la API:** Implementación funcional del cliente en `api/blockchain_client.py` que recupera datos en vivo (Altura, Hash, Dificultad, Nonce).
-3.  **Documentación inicial:** Definición del alcance del proyecto y selección del componente de IA.
+## Progreso Actual
 
-## ⏭️ Próximos Pasos
-* Instalación y configuración de **Streamlit** para la interfaz visual.
-* Mapeo de los datos de la API hacia los widgets del dashboard en `app.py`.
+- [x] Repositorio de GitHub Classroom aceptado y clonado localmente
+- [x] Estructura de carpetas configurada (`api/`, `modules/`, `report/`)
+- [x] Cliente API funcional en `api/blockchain_client.py` — recupera el último bloque en tiempo real (altura, hash, dificultad, nonce)
+- [x] README completo con información del estudiante y enfoque de IA
+- [ ] Implementación de módulos M1–M4
+- [ ] Tests de integración y validación de la verificación local del PoW
+
+---
+
+## Próximo Paso
+
+Implementar **M1** (Monitor de Proof of Work) y **M2** (Analizador de Header): añadir las funciones `get_block()` y `get_difficulty_history()` al cliente API y conectarlas a los tabs del dashboard.
+
+---
+
+## Bloqueadores
+
+Ninguno actualmente.
+
+---
+
+## Instrucciones de Ejecución
+
+```bash
+# 1. Instalar dependencias
+pip install -r requirements.txt
+
+# 2. Lanzar el dashboard
+streamlit run app.py
+```
