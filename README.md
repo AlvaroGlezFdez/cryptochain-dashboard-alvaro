@@ -1,7 +1,7 @@
 # CryptoChain Insights Dashboard
 
 **Estudiante:** Álvaro González Fernández  
-**GitHub User:** TU_USUARIO  
+**GitHub User:** AlvaroGlezFdez  
 **Asignatura:** Criptografía  
 **Institución:** Universidad Alfonso X el Sabio (UAX)  
 **Profesor:** Jorge Calvo  
